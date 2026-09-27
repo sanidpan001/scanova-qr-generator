@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanova — Free QR Code Generator | UPI, WiFi, vCard & Batch QR Codes</title>
+<meta name="description" content="Scanova is a free QR code generator with UPI payment QR presets, WiFi, vCard, WhatsApp codes, logo overlay, PNG & SVG downloads, and free batch QR generation from a list — no signup, unlimited use.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Nunito', system-ui, sans-serif; }
+  .font-display { font-family: 'Baloo 2', 'Nunito', sans-serif; }
+  .grad-text { background: linear-gradient(120deg, #8B5CF6, #FB7185); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad-btn { background: linear-gradient(120deg, #8B5CF6, #FB7185); }
+  .grad-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+  .grad-btn:active { transform: translateY(0); }
+  .bento-card { background: #fff; border-radius: 1.75rem; box-shadow: 0 10px 40px -12px rgba(139,92,246,.18); border: 1px solid rgba(139,92,246,.12); }
+  .type-pill { transition: all .18s ease; }
+  .type-pill.active { background: linear-gradient(120deg, #8B5CF6, #FB7185); color: #fff; box-shadow: 0 6px 18px -6px rgba(251,113,133,.55); }
+  .qr-cell { transition: transform .15s ease; }
+  .qr-cell:hover { transform: translateY(-3px); }
+  input[type=range] { accent-color: #8B5CF6; }
+  .blob { position: absolute; filter: blur(70px); opacity: .35; border-radius: 9999px; pointer-events: none; }
+  @media print { .no-print { display: none !important; } }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is Scanova's QR code generator really free with unlimited use?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Scanova is completely free with no signup, no paywall, and no watermark. Every QR code you create is a static QR code that never expires and can be scanned an unlimited number of times. There are no scan limits and no accounts to create — the tool runs entirely in your browser." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a UPI QR code and how does Scanova's UPI preset work?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A UPI QR code encodes a standard upi://pay payment link containing your UPI ID (VPA), payee name, an optional fixed amount, and an optional note. When a customer scans it with any UPI app such as Google Pay, PhonePe, Paytm, or BHIM, the payment screen opens pre-filled with your details. Scanova builds this link in the format upi://pay?pa=YOURID&pn=NAME&am=AMOUNT&cu=INR exactly as the NPCI UPI specification describes, so it works across all UPI apps." }
+    },
+    {
+      "@type": "Question",
+      "name": "Will adding my logo to a QR code stop it from scanning?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Not if it is done correctly. QR codes include built-in error correction that can recover part of the pattern even when obscured. Scanova automatically raises error correction to the highest level (H) when you add a logo, keeps the logo small and centered, and leaves the three corner finder patterns untouched — which is why logo QR codes made with Scanova stay scannable." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do batch QR codes work on Scanova?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Paste one item per line — URLs, text, UPI links, or any content — and Scanova generates a separate QR code for each line, up to 50 per batch. Every batch code can be downloaded individually as PNG or SVG. This is ideal for product labels, event badges, table tent cards, inventory tags, or invoice payment links." }
+    },
+    {
+      "@type": "Question",
+      "name": "What size should I print my QR code?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A QR code should be at least 2 x 2 cm (about 0.8 inches) for close-range scanning like business cards, and larger for distance — roughly 10 cm per meter of scanning distance as a rule of thumb. For print, download the PNG at 1024 or 2048 pixels, or use the SVG export which scales to any size without quality loss." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my data sent to a server when I generate a QR code?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Scanova generates every QR code locally in your browser using JavaScript. Your text, WiFi passwords, contact details, and UPI IDs never leave your device — nothing is uploaded, stored, or tracked. This also means the tool works offline once the page has loaded." }
+    }
+  ]
+}
+</script>
+</head>
+<body id="top" class="bg-[#FFF9F6] text-slate-800 antialiased">
+
+<!-- Header -->
+<header class="no-print sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-violet-100">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center justify-between">
+    <a href="#top" class="font-display text-2xl font-800 font-extrabold tracking-tight">
+      <span class="grad-text">Scanova</span>
+    </a>
+    <nav class="flex items-center gap-5 text-sm font-bold">
+      <a href="#top" class="text-slate-600 hover:text-violet-600 transition">Home</a>
+      <a href="https://fixoraa.tech" class="px-4 py-2 rounded-full grad-btn text-white shadow-md">More Tools</a>
+    </nav>
+  </div>
+</header>
+
+<main class="relative overflow-hidden">
+  <div class="blob w-96 h-96 bg-violet-300 -top-20 -left-24"></div>
+  <div class="blob w-96 h-96 bg-rose-300 top-40 -right-24"></div>
+
+  <!-- Hero -->
+  <section class="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-6 text-center">
+    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-violet-200 text-violet-700 text-xs font-extrabold tracking-widest uppercase shadow-sm">
+      <span class="w-2 h-2 rounded-full bg-gradient-to-br from-violet-500 to-rose-400 animate-pulse"></span>
+      Unlimited Free Usage
+    </span>
+    <h1 class="font-display text-4xl sm:text-5xl font-extrabold mt-4 leading-tight">
+      Make QR codes that <span class="grad-text">pop</span> — free, forever
+    </h1>
+    <p class="mt-3 text-slate-500 max-w-2xl mx-auto font-medium">
+      URL, WiFi, vCard, WhatsApp and <strong class="text-slate-700">UPI payment</strong> QR codes with logo overlay,
+      PNG &amp; SVG export, plus free batch generation. No signup, no watermark, 100% in your browser.
+    </p>
+  </section>
+
+  <!-- TOP AD -->
+  <div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-4" role="complementary" aria-label="Advertisement">
+    <div class="mx-auto text-center" style="max-width:728px">
+      <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+      <div class="flex justify-center overflow-hidden">
+        <div class="origin-top scale-[0.44] sm:scale-100 shrink-0">
+          <script>
+            atOptions = { 'key' : '4e68ac77881c17fe128a46565d9a4e8c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+          </script>
+          <script src="https://www.highrevenueformat.com/4e68ac77881c17fe128a46565d9a4e8c/invoke.js"></script>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOL : bento grid -->
+  <section class="no-print relative mx-auto max-w-6xl px-4 sm:px-6 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- Card 1: content type + form -->
+      <div class="bento-card lg:col-span-7 p-6 sm:p-8">
+        <h2 class="font-display text-2xl font-extrabold">1 · What should it say?</h2>
+        <p class="text-sm text-slate-500 mt-1 mb-4 font-medium">Pick a type, fill the fields — your QR updates live.</p>
+        <div id="typePills" class="flex flex-wrap gap-2 mb-5"></div>
+        <div id="formArea"></div>
+        <div id="formError" class="hidden mt-3 text-sm font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5"></div>
+        <div class="mt-4 flex items-center justify-between text-xs font-bold text-slate-400">
+          <span id="charCount">0 characters</span>
+          <span id="payloadPreview" class="truncate max-w-[60%] text-slate-400"></span>
+        </div>
+      </div>
+
+      <!-- Card 2: preview -->
+      <div class="bento-card lg:col-span-5 p-6 sm:p-8 flex flex-col items-center bg-gradient-to-b from-white to-violet-50/60">
+        <h2 class="font-display text-2xl font-extrabold self-start">2 · Preview</h2>
+        <div id="qrStage" class="mt-4 w-full max-w-[300px] aspect-square rounded-3xl border-2 border-dashed border-violet-200 bg-white flex items-center justify-center overflow-hidden shadow-inner">
+          <span id="qrEmpty" class="text-slate-400 text-sm font-semibold px-6 text-center">Your QR code will appear here</span>
+          <canvas id="qrCanvas" class="hidden w-full h-full"></canvas>
+        </div>
+        <p id="scanHint" class="hidden mt-3 text-xs font-bold text-emerald-600">✓ Looks good — test-scan it with your phone camera</p>
+        <div class="mt-4 flex flex-wrap justify-center gap-2">
+          <button id="btnPNG" class="grad-btn text-white font-extrabold px-5 py-2.5 rounded-full shadow-md transition disabled:opacity-40 disabled:pointer-events-none" disabled>Download PNG</button>
+          <button id="btnSVG" class="font-extrabold px-5 py-2.5 rounded-full border-2 border-violet-300 text-violet-700 hover:bg-violet-50 transition disabled:opacity-40 disabled:pointer-events-none" disabled>Download SVG</button>
+        </div>
+        <p class="mt-3 text-[11px] text-slate-400 font-semibold">PNG renders at your chosen size · SVG is infinitely scalable</p>
+      </div>
+
+      <!-- Card 3: style -->
+      <div class="bento-card lg:col-span-7 p-6 sm:p-8">
+        <h2 class="font-display text-2xl font-extrabold">3 · Make it yours</h2>
+        <p class="text-sm text-slate-500 mt-1 mb-5 font-medium">Colors, size, error correction and your logo.</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-5">
+          <div>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-500">QR color</label>
+            <div class="mt-2 flex items-center gap-2">
+              <input type="color" id="fgColor" value="#1e1b4b" class="w-11 h-11 rounded-xl cursor-pointer border border-slate-200 p-1 bg-white">
+              <span id="fgHex" class="text-sm font-bold text-slate-600">#1E1B4B</span>
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Background</label>
+            <div class="mt-2 flex items-center gap-2">
+              <input type="color" id="bgColor" value="#ffffff" class="w-11 h-11 rounded-xl cursor-pointer border border-slate-200 p-1 bg-white">
+              <span id="bgHex" class="text-sm font-bold text-slate-600">#FFFFFF</span>
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-500">PNG size</label>
+            <select id="pngSize" class="mt-2 w-full rounded-xl border-2 border-violet-100 bg-white px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-violet-400">
+              <option value="512">512 px — web</option>
+              <option value="1024" selected>1024 px — print</option>
+              <option value="2048">2048 px — large print</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Error correction</label>
+            <select id="ecLevel" class="mt-2 w-full rounded-xl border-2 border-violet-100 bg-white px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-violet-400">
+              <option value="M" selected>M — balanced</option>
+              <option value="L">L — max data</option>
+              <option value="Q">Q — high</option>
+              <option value="H">H — max durability</option>
+            </select>
+            <p id="ecNote" class="text-[11px] text-slate-400 font-semibold mt-1">Auto-raised to H when a logo is added.</p>
+          </div>
+          <div>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Quiet zone: <span id="qzVal" class="text-violet-600">4</span></label>
+            <input type="range" id="quietZone" min="0" max="8" value="4" class="mt-3 w-full">
+          </div>
+          <div>
+            <label class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Logo size: <span id="logoSizeVal" class="text-violet-600">22%</span></label>
+            <input type="range" id="logoSize" min="10" max="35" value="22" class="mt-3 w-full">
+          </div>
+        </div>
+        <div class="mt-5 flex flex-wrap items-center gap-3">
+          <label class="cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-dashed border-violet-300 text-violet-700 font-extrabold text-sm hover:bg-violet-50 transition">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/></svg>
+            Upload logo
+            <input type="file" id="logoFile" accept="image/*" class="hidden">
+          </label>
+          <button id="logoClear" class="hidden text-sm font-bold text-rose-500 hover:text-rose-700">Remove logo ✕</button>
+          <span id="logoName" class="text-xs font-bold text-slate-400 truncate max-w-[200px]"></span>
+        </div>
+      </div>
+
+      <!-- Card 4: batch -->
+      <div class="bento-card lg:col-span-5 p-6 sm:p-8 bg-gradient-to-b from-white to-rose-50/60">
+        <h2 class="font-display text-2xl font-extrabold">4 · Batch mode <span class="text-sm align-middle ml-1 px-2 py-0.5 rounded-full bg-rose-100 text-rose-600 font-extrabold">FREE</span></h2>
+        <p class="text-sm text-slate-500 mt-1 mb-4 font-medium">One item per line — get a QR for each. Up to 50.</p>
+        <textarea id="batchInput" rows="4" placeholder="https://example.com&#10;upi://pay?pa=shop@bank&#10;WIFI:S:MyCafe&#10;Hello, scan me!" class="w-full rounded-2xl border-2 border-violet-100 px-4 py-3 text-sm font-semibold focus:outline-none focus:border-violet-400 resize-y"></textarea>
+        <button id="btnBatch" class="grad-btn mt-3 w-full text-white font-extrabold px-5 py-3 rounded-2xl shadow-md transition">Generate batch QRs</button>
+        <div id="batchGrid" class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-1"></div>
+        <p id="batchEmpty" class="mt-3 text-xs text-slate-400 font-semibold text-center">Your batch codes will show up here, each with its own PNG &amp; SVG download.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BOTTOM AD -->
+  <div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pb-4" role="complementary" aria-label="Advertisement">
+    <div class="mx-auto text-center" style="max-width:728px">
+      <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+      <div class="flex justify-center overflow-hidden">
+        <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="464498"></script>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEO article -->
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 py-10">
+    <article class="prose-article text-slate-600 leading-relaxed">
+      <h2 class="font-display text-3xl font-extrabold text-slate-800 mb-4">The complete guide to QR codes: types, design, printing, and UPI payments</h2>
+      <p class="mb-4">QR codes — those square, pixelated patterns — have quietly become one of the most useful bridges between the physical and digital worlds. A single scan can open a website, connect a guest to your WiFi, save a contact to a phone, start a WhatsApp chat, or even complete a payment. Yet most free QR generators only scratch the surface: they make a plain black-and-white code for a URL and stop there. Scanova was built to cover the full spectrum — from everyday URL codes to UPI payment QR codes, WiFi credentials, vCards, WhatsApp links, styled codes with your logo, and even free batch generation for when you need dozens of codes at once.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">How QR codes actually work</h3>
+      <p class="mb-4">A QR code is simply encoded text rendered as a pattern of dark and light modules. The three large squares in the corners — the finder patterns — tell the scanner where the code begins and how it is oriented, which is why a QR code scans at any angle. The data itself is protected by Reed–Solomon error correction, the same mathematical technique used on scratched CDs. Depending on the error-correction level chosen, between 7% and 30% of the code can be damaged, dirty, or covered up and the code will still scan perfectly. This is the property that makes logo overlays possible: the logo covers part of the pattern, and error correction fills in the gaps.</p>
+      <p class="mb-4">There are two broad families of QR codes. Static QR codes encode the destination directly — the URL, text, or payment link lives inside the pattern itself, so the code works forever and needs no server. Dynamic QR codes encode a short redirect link hosted by a service, which lets you change the destination later and track scans, but requires a paid subscription and means the service could shut down your codes. Scanova generates static QR codes: they never expire, need no account, and cannot be switched off by anyone but you.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">The QR content types that matter most</h3>
+      <p class="mb-4"><strong class="text-slate-800">URL and text.</strong> The classics. A URL code should open fast — use the shortest link you can, since shorter content produces a less dense, easier-to-scan pattern. Always test-scan before printing; a surprising number of printed codes fail because of typos that nobody checked.</p>
+      <p class="mb-4"><strong class="text-slate-800">WiFi.</strong> A WiFi QR code encodes your network name, password, and encryption type in a special format (WIFI:T:WPA;S:MyNetwork;P:secret;;). Guests point their camera at the code and their phone offers to join the network — no more dictating long passwords or watching typos. Cafés, Airbnb hosts, offices, and event venues get the most mileage from this type. Special characters in the password are automatically escaped so the code stays valid.</p>
+      <p class="mb-4"><strong class="text-slate-800">vCard.</strong> A vCard QR code stores contact details in the vCard format that phones understand. Scan it and the phone opens a new contact pre-filled with name, phone number, email, organisation, and website. It is the digital successor to the business card — stick one on your card, email signature, or conference badge and people save your details in one tap instead of typing them.</p>
+      <p class="mb-4"><strong class="text-slate-800">WhatsApp.</strong> A WhatsApp QR encodes a wa.me link with your phone number and an optional pre-filled message. Small businesses use these for "chat with us" stickers, customer support desks, and order-taking: the customer scans, WhatsApp opens with a greeting already typed, and the conversation starts.</p>
+      <p class="mb-4"><strong class="text-slate-800">Email, SMS, phone, and location.</strong> These small presets open the right app with fields pre-filled: an email QR can set the recipient, subject, and body; an SMS QR pre-fills the number and message; a phone QR opens the dialer; a location QR drops a map pin at your coordinates. Each is a tiny convenience that removes a step between a customer's intention and action.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">UPI payment QR codes: a game-changer for India</h3>
+      <p class="mb-4">In India, the QR code found its killer use case: instant payments. A UPI QR code encodes a payment instruction in the format <em>upi://pay?pa=yourname@bank&amp;pn=YourName&amp;am=100&amp;cu=INR</em>. When a customer scans it with Google Pay, PhonePe, Paytm, BHIM, or any UPI app, the payment screen opens with your UPI ID, name, and amount already filled in — the customer just enters their UPI PIN. No card machine, no payment gateway fees, no hardware at all.</p>
+      <p class="mb-4">Two flavours exist. An <strong class="text-slate-800">open-amount</strong> QR leaves the amount blank so the payer types it — perfect for a shop counter or a donation box where every bill differs. A <strong class="text-slate-800">fixed-amount</strong> QR locks in a specific rupee value, which is ideal for invoices, fees, tickets, and menu items where the price is known in advance. Scanova's UPI preset supports both: leave the amount empty for open payments, or set it for fixed ones, and optionally add a transaction note that appears in the payer's app.</p>
+      <p class="mb-4">UPI QR codes work for far more than retail. Freelancers put them on invoices to get paid faster. Landlords stick them on rent receipts. Event organisers use fixed-amount codes for ticket sales. Restaurants print table-specific codes so bills are settled at the table. Because the upi://pay format is an open NPCI standard, a code you generate works in every UPI app — you are never locked to one provider. And since Scanova builds the code entirely in your browser, your UPI ID is never sent to any server.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">Designing QR codes that stay scannable</h3>
+      <p class="mb-4">A pretty QR code that does not scan is a failure, so design rules matter. The golden rule is <strong class="text-slate-800">contrast</strong>: the dark modules must stand out clearly against the background. Dark-on-light works; light-on-dark often fails because many scanners look for dark finder patterns on a light field. Avoid inverting your colours, and keep the contrast ratio high — deep indigo on white is safe, pastel pink on cream is not.</p>
+      <p class="mb-4">The second rule concerns <strong class="text-slate-800">logos</strong>. Place the logo in the centre, keep it modest (Scanova defaults to 22% of the code width and caps it at 35%), never cover the three corner squares, and raise error correction to level H. Scanova does the last step automatically the moment you upload a logo. Test the finished code with two different phones — an iPhone camera and one Android camera app — before you print hundreds of copies.</p>
+      <p class="mb-4">The third rule is <strong class="text-slate-800">quiet zone</strong>: the blank margin around the code. Scanners need that breathing room to find the code's edges. Four modules of margin is the standard; Scanova gives you a slider from zero to eight so you can match any layout, but keep at least the default unless you know the surrounding design provides the margin for you.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">Print sizes, formats, and materials</h3>
+      <p class="mb-4">For anything printed, resolution is everything. A useful rule of thumb: the code should be at least 2 × 2 cm for close-range scanning (business cards, product labels) and roughly 10 cm of code width per metre of scanning distance (posters, banners, shop windows). Scanova's PNG export goes up to 2048 pixels for crisp print, and the SVG export is vector — it scales to billboard size without a single jagged edge.</p>
+      <p class="mb-4">Material matters too. Matte surfaces scan more reliably than glossy ones because glare can wash out the pattern. If the code lives outdoors, laminate it or print on weatherproof stock — sun-faded codes are a common failure. On curved surfaces like bottles or mugs, keep the code small enough that it does not wrap too far around the curve, since distortion hurts readability. And always leave the code flat: a crease through the middle of a folded flyer can be enough to break it.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">Batch QR codes: when you need dozens, not one</h3>
+      <p class="mb-4">Some jobs need QR codes in bulk: product serial numbers, table tent cards for a restaurant, asset tags for an office inventory, attendee badges for a conference, or per-invoice UPI payment links. Most free generators make you create each code one by one, and bulk features are usually locked behind business plans. Scanova's batch mode takes a pasted list — one item per line — and generates a separate downloadable code for each, up to 50 per batch. Each batch code downloads individually as PNG or SVG, so you can drop them straight into a label template or print run.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">QR security: scan smart</h3>
+      <p class="mb-4">A few honest cautions apply to every QR tool, including this one. Never encode a QR code from a link you do not trust — malicious codes can lead to phishing sites. If you receive a payment QR, verify the payee name shown in your UPI app before entering your PIN; scammers sometimes swap QR stickers on shop counters. For your own codes, prefer static codes for anything permanent (printed menus, signage) since they cannot be hijacked by a redirect service going rogue. And remember that anything encoded in a QR — including WiFi passwords — is readable by anyone who can see the code, so do not post your home WiFi QR publicly.</p>
+      <p class="mb-4">Privacy is the other half of the story. Many online generators upload your content to their servers to create the image. Scanova does all encoding and rendering locally in your browser with the open-source qrcode-generator library — your text, contacts, WiFi passwords, and UPI IDs never leave your device. There is no account, no tracking, and no database of your codes.</p>
+
+      <h3 class="font-display text-2xl font-extrabold text-slate-800 mt-8 mb-3">Getting the most out of Scanova</h3>
+      <p class="mb-4">Start with the content card: choose the type that matches your goal, fill in the fields, and watch the preview update live. Then style it — match the colours to your brand, upload your logo for the centre, and pick a PNG size suited to where the code will live (512 px for screens, 1024–2048 px for print). Download the SVG as well: it is the master copy you will thank yourself for when a designer later asks for the code at poster size. If you need many codes, switch to batch mode and paste your list. Everything is free, unlimited, and watermark-free — the only limit is your imagination for where a scan can take someone.</p>
+    </article>
+
+    <!-- FAQs -->
+    <div class="mt-12">
+      <h2 class="font-display text-3xl font-extrabold text-slate-800 mb-6 text-center">Frequently asked questions</h2>
+      <div class="space-y-3">
+        <details class="bento-card p-5">
+          <summary class="font-display font-extrabold text-lg cursor-pointer text-slate-800">Is Scanova's QR code generator really free with unlimited use?</summary>
+          <p class="mt-2 text-slate-600">Yes. Scanova is completely free with no signup, no paywall, and no watermark. Every QR code you create is a static QR code that never expires and can be scanned an unlimited number of times. There are no scan limits and no accounts to create — the tool runs entirely in your browser.</p>
+        </details>
+        <details class="bento-card p-5">
+          <summary class="font-display font-extrabold text-lg cursor-pointer text-slate-800">What is a UPI QR code and how does Scanova's UPI preset work?</summary>
+          <p class="mt-2 text-slate-600">A UPI QR code encodes a standard upi://pay payment link containing your UPI ID (VPA), payee name, an optional fixed amount, and an optional note. When a customer scans it with any UPI app such as Google Pay, PhonePe, Paytm, or BHIM, the payment screen opens pre-filled with your details. Scanova builds this link in the format upi://pay?pa=YOURID&amp;pn=NAME&amp;am=AMOUNT&amp;cu=INR exactly as the UPI specification describes, so it works across all UPI apps.</p>
+        </details>
+        <details class="bento-card p-5">
+          <summary class="font-display font-extrabold text-lg cursor-pointer text-slate-800">Will adding my logo to a QR code stop it from scanning?</summary>
+          <p class="mt-2 text-slate-600">Not if it is done correctly. QR codes include built-in error correction that can recover part of the pattern even when obscured. Scanova automatically raises error correction to the highest level (H) when you add a logo, keeps the logo small and centred, and leaves the three corner finder patterns untouched — which is why logo QR codes made with Scanova stay scannable.</p>
+        </details>
+        <details class="bento-card p-5">
+          <summary class="font-display font-extrabold text-lg cursor-pointer text-slate-800">How do batch QR codes work on Scanova?</summary>
+          <p class="mt-2 text-slate-600">Paste one item per line — URLs, text, UPI links, or any content — and Scanova generates a separate QR code for each line, up to 50 per batch. Every batch code can be downloaded individually as PNG or SVG. This is ideal for product labels, event badges, table tent cards, inventory tags, or invoice payment links.</p>
+        </details>
+        <details class="bento-card p-5">
+          <summary class="font-display font-extrabold text-lg cursor-pointer text-slate-800">What size should I print my QR code?</summary>
+          <p class="mt-2 text-slate-600">A QR code should be at least 2 × 2 cm (about 0.8 inches) for close-range scanning like business cards, and larger for distance — roughly 10 cm per metre of scanning distance as a rule of thumb. For print, download the PNG at 1024 or 2048 pixels, or use the SVG export which scales to any size without quality loss.</p>
+        </details>
+        <details class="bento-card p-5">
+          <summary class="font-display font-extrabold text-lg cursor-pointer text-slate-800">Is my data sent to a server when I generate a QR code?</summary>
+          <p class="mt-2 text-slate-600">No. Scanova generates every QR code locally in your browser using JavaScript. Your text, WiFi passwords, contact details, and UPI IDs never leave your device — nothing is uploaded, stored, or tracked. This also means the tool works offline once the page has loaded.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer class="no-print border-t border-violet-100 mt-6">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span class="font-display text-xl font-extrabold grad-text">Scanova</span>
+      <p class="text-xs text-slate-400 font-semibold">Free QR codes for everyone · made with care, in your browser.</p>
+      <nav class="flex gap-5 text-sm font-bold">
+        <a href="#top" class="text-slate-500 hover:text-violet-600">Home</a>
+        <a href="https://fixoraa.tech" class="text-slate-500 hover:text-violet-600">More Tools</a>
+      </nav>
+    </div>
+  </footer>
+</main>
+
+<script>
+/*PURE-LOGIC-START*/
+function escUri(v){ return encodeURIComponent(String(v === undefined || v === null ? '' : v).trim()); }
+function buildUPI(o){
+  o = o || {};
+  var s = 'upi://pay?pa=' + escUri(o.pa) + '&pn=' + escUri(o.pn);
+  var am = String(o.am === undefined || o.am === null ? '' : o.am).trim();
+  if (am !== '' && !isNaN(Number(am)) && Number(am) > 0) s += '&am=' + escUri(am);
+  s += '&cu=INR';
+  if (String(o.note === undefined || o.note === null ? '' : o.note).trim() !== '') s += '&tn=' + escUri(o.note);
+  return s;
+}
+function validUPI(pa){ return /^[\w.\-]{2,256}@[a-zA-Z]{2,64}$/.test(String(pa || '').trim()); }
+function escapeWifi(s){
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/:/g, '\\:').replace(/"/g, '\\"');
+}
+function buildWiFi(o){
+  o = o || {};
+  var t = (o.type === 'WEP' || o.type === 'nopass') ? o.type : 'WPA';
+  var s = 'WIFI:T:' + t + ';S:' + escapeWifi(o.ssid);
+  if (t !== 'nopass') s += ';P:' + escapeWifi(o.pass);
+  if (o.hidden) s += ';H:true';
+  return s + ';;';
+}
+function buildVCard(o){
+  o = o || {};
+  var esc = function(v){ return String(v || '').replace(/\n/g, '\\n').replace(/;/g, '\\;'); };
+  var L = ['BEGIN:VCARD', 'VERSION:3.0'];
+  if (String(o.fn || '').trim()) L.push('FN:' + esc(o.fn.trim()));
+  if (String(o.org || '').trim()) L.push('ORG:' + esc(o.org.trim()));
+  if (String(o.tel || '').trim()) L.push('TEL:' + esc(o.tel.trim()));
+  if (String(o.email || '').trim()) L.push('EMAIL:' + esc(o.email.trim()));
+  if (String(o.url || '').trim()) L.push('URL:' + esc(o.url.trim()));
+  L.push('END:VCARD');
+  return L.join('\n');
+}
+function buildWhatsApp(o){
+  o = o || {};
+  var p = String(o.phone || '').replace(/\D/g, '');
+  var s = 'https://wa.me/' + p;
+  if (String(o.text || '').trim() !== '') s += '?text=' + encodeURIComponent(o.text.trim());
+  return s;
+}
+function buildURL(u){
+  u = String(u === undefined || u === null ? '' : u).trim();
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(u)) u = 'https://' + u;
+  return u;
+}
+function buildEmail(o){
+  o = o || {};
+  var s = 'mailto:' + String(o.to || '').trim();
+  var q = [];
+  if (String(o.subject || '').trim() !== '') q.push('subject=' + encodeURIComponent(o.subject.trim()));
+  if (String(o.body || '').trim() !== '') q.push('body=' + encodeURIComponent(o.body.trim()));
+  if (q.length) s += '?' + q.join('&');
+  return s;
+}
+function buildSMS(o){
+  o = o || {};
+  var s = 'SMSTO:' + String(o.number || '').replace(/\D/g, '');
+  if (String(o.message || '').trim() !== '') s += ':' + String(o.message).trim();
+  return s;
+}
+function buildTel(o){ return 'tel:' + String((o && o.number) || '').trim().replace(/[\s\-()]/g, ''); }
+function buildGeo(o){
+  o = o || {};
+  return 'geo:' + String(o.lat).trim() + ',' + String(o.lng).trim();
+}
+function parseBatchList(text){
+  return String(text === undefined || text === null ? '' : text)
+    .split(/\r?\n/).map(function(l){ return l.trim(); })
+    .filter(function(l){ return l.length > 0; });
+}
+/*PURE-LOGIC-END*/
+</script>
+
+<script>
+(function(){
+  'use strict';
+  var TYPES = [
+    { id:'url', label:'URL', icon:'🔗', fields:[
+      {k:'url', label:'Website URL', ph:'https://example.com', hint:'https:// is added automatically if missing.'}
+    ]},
+    { id:'text', label:'Text', icon:'📝', fields:[
+      {k:'text', label:'Plain text', ph:'Type anything to encode…', textarea:true}
+    ]},
+    { id:'upi', label:'UPI Payment', icon:'💸', badge:'INDIA', fields:[
+      {k:'pa', label:'UPI ID (VPA)', ph:'yourname@bank'},
+      {k:'pn', label:'Payee name', ph:'Your shop / name'},
+      {k:'am', label:'Amount ₹ (optional — leave empty for open amount)', ph:'100', inputType:'number'},
+      {k:'note', label:'Note (optional)', ph:'Invoice #123'}
+    ]},
+    { id:'wifi', label:'WiFi', icon:'📶', fields:[
+      {k:'ssid', label:'Network name (SSID)', ph:'MyCafe-WiFi'},
+      {k:'pass', label:'Password', ph:'••••••••', inputType:'password'},
+      {k:'type', label:'Security', select:['WPA','WEP','nopass'], selectLabels:['WPA / WPA2','WEP','None (open)']},
+      {k:'hidden', label:'Hidden network', checkbox:true}
+    ]},
+    { id:'vcard', label:'vCard', icon:'👤', fields:[
+      {k:'fn', label:'Full name', ph:'Aarav Sharma'},
+      {k:'tel', label:'Phone', ph:'+91 98765 43210'},
+      {k:'email', label:'Email', ph:'you@example.com', inputType:'email'},
+      {k:'org', label:'Organisation (optional)', ph:'Acme Pvt Ltd'},
+      {k:'url', label:'Website (optional)', ph:'https://example.com'}
+    ]},
+    { id:'whatsapp', label:'WhatsApp', icon:'💬', fields:[
+      {k:'phone', label:'Phone (with country code)', ph:'919876543210'},
+      {k:'text', label:'Pre-filled message (optional)', ph:'Hi! I found you via QR.', textarea:true}
+    ]},
+    { id:'email', label:'Email', icon:'✉️', fields:[
+      {k:'to', label:'To', ph:'hello@example.com', inputType:'email'},
+      {k:'subject', label:'Subject (optional)', ph:'Hello!'},
+      {k:'body', label:'Body (optional)', ph:'…', textarea:true}
+    ]},
+    { id:'sms', label:'SMS', icon:'📱', fields:[
+      {k:'number', label:'Phone number', ph:'9876543210'},
+      {k:'message', label:'Message (optional)', ph:'Hi there!'}
+    ]},
+    { id:'phone', label:'Phone', icon:'📞', fields:[
+      {k:'number', label:'Phone number', ph:'+91 98765 43210'}
+    ]},
+    { id:'geo', label:'Location', icon:'📍', fields:[
+      {k:'lat', label:'Latitude', ph:'28.6139'},
+      {k:'lng', label:'Longitude', ph:'77.2090'}
+    ]}
+  ];
+
+  var state = { type:'url', logoDataUrl:null, logoImg:null, currentText:'', lastQR:null };
+  var $ = function(id){ return document.getElementById(id); };
+  var pillsEl = $('typePills'), formArea = $('formArea'), formError = $('formError');
+
+  function fieldHTML(f){
+    var base = 'w-full rounded-2xl border-2 border-violet-100 bg-violet-50/40 px-4 py-3 text-sm font-semibold focus:outline-none focus:border-violet-400 focus:bg-white transition';
+    var label = '<label class="block text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-1.5">' + f.label + '</label>';
+    if (f.checkbox){
+      return '<label class="flex items-center gap-3 cursor-pointer rounded-2xl border-2 border-violet-100 px-4 py-3 bg-violet-50/40">' +
+        '<input type="checkbox" data-k="' + f.k + '" class="w-5 h-5 accent-violet-600">' +
+        '<span class="text-sm font-bold text-slate-600">' + f.label + '</span></label>';
+    }
+    if (f.select){
+      var opts = f.select.map(function(v,i){ return '<option value="' + v + '">' + (f.selectLabels ? f.selectLabels[i] : v) + '</option>'; }).join('');
+      return '<div>' + label + '<select data-k="' + f.k + '" class="' + base + '">' + opts + '</select></div>';
+    }
+    if (f.textarea){
+      return '<div>' + label + '<textarea data-k="' + f.k + '" rows="3" placeholder="' + f.ph + '" class="' + base + ' resize-y"></textarea>' +
+        (f.hint ? '<p class="text-[11px] text-slate-400 font-semibold mt-1">' + f.hint + '</p>' : '') + '</div>';
+    }
+    return '<div>' + label + '<input data-k="' + f.k + '" type="' + (f.inputType || 'text') + '" placeholder="' + f.ph + '" class="' + base + '">' +
+      (f.hint ? '<p class="text-[11px] text-slate-400 font-semibold mt-1">' + f.hint + '</p>' : '') + '</div>';
+  }
+
+  function renderPills(){
+    pillsEl.innerHTML = TYPES.map(function(t){
+      return '<button data-type="' + t.id + '" class="type-pill ' + (t.id === state.type ? 'active' : '') +
+        ' px-4 py-2 rounded-full text-sm font-extrabold bg-white border-2 border-violet-100 text-slate-600 hover:border-violet-300">' +
+        t.icon + ' ' + t.label + (t.badge ? ' <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">' + t.badge + '</span>' : '') + '</button>';
+    }).join('');
+    pillsEl.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){ state.type = b.getAttribute('data-type'); renderPills(); renderForm(); scheduleUpdate(); });
+    });
+  }
+
+  function renderForm(){
+    var t = TYPES.filter(function(x){ return x.id === state.type; })[0];
+    formArea.innerHTML = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">' +
+      t.fields.map(function(f){ return fieldHTML(f); }).join('') + '</div>';
+    formArea.querySelectorAll('input,textarea,select').forEach(function(el){
+      el.addEventListener('input', scheduleUpdate);
+      el.addEventListener('change', scheduleUpdate);
+    });
+  }
+
+  function collectVals(){
+    var vals = {};
+    formArea.querySelectorAll('[data-k]').forEach(function(el){
+      if (el.type === 'checkbox') vals[el.getAttribute('data-k')] = el.checked;
+      else vals[el.getAttribute('data-k')] = el.value;
+    });
+    return vals;
+  }
+
+  function buildPayload(){
+    var v = collectVals(), text = '', error = '';
+    switch (state.type){
+      case 'url':
+        if (!v.url || !v.url.trim()) error = 'Enter a website URL to encode.';
+        else text = buildURL(v.url);
+        break;
+      case 'text':
+        if (!v.text || !v.text.trim()) error = 'Type some text to encode.';
+        else text = v.text.trim();
+        break;
+      case 'upi':
+        if (!v.pa || !validUPI(v.pa)) error = 'Enter a valid UPI ID, e.g. yourname@bank.';
+        else if (!v.pn || !v.pn.trim()) error = 'Enter the payee name shown to the payer.';
+        else text = buildUPI(v);
+        break;
+      case 'wifi':
+        if (!v.ssid || !v.ssid.trim()) error = 'Enter your WiFi network name (SSID).';
+        else if (v.type !== 'nopass' && (!v.pass || !v.pass.trim())) error = 'Enter the WiFi password (or pick "None (open)").';
+        else text = buildWiFi(v);
+        break;
+      case 'vcard':
+        if (!v.fn || !v.fn.trim()) error = 'Enter at least a full name for the vCard.';
+        else text = buildVCard(v);
+        break;
+      case 'whatsapp':
+        if (!v.phone || v.phone.replace(/\D/g,'').length < 7) error = 'Enter a valid phone number with country code, e.g. 919876543210.';
+        else text = buildWhatsApp(v);
+        break;
+      case 'email':
+        if (!v.to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.to.trim())) error = 'Enter a valid email address.';
+        else text = buildEmail(v);
+        break;
+      case 'sms':
+        if (!v.number || v.number.replace(/\D/g,'').length < 7) error = 'Enter a valid phone number.';
+        else text = buildSMS(v);
+        break;
+      case 'phone':
+        if (!v.number || v.number.replace(/\D/g,'').length < 7) error = 'Enter a valid phone number.';
+        else text = buildTel(v);
+        break;
+      case 'geo':
+        var la = parseFloat(v.lat), ln = parseFloat(v.lng);
+        if (isNaN(la) || la < -90 || la > 90) error = 'Latitude must be a number between -90 and 90.';
+        else if (isNaN(ln) || ln < -180 || ln > 180) error = 'Longitude must be a number between -180 and 180.';
+        else text = buildGeo({lat:String(la), lng:String(ln)});
+        break;
+    }
+    return { text:text, error:error };
+  }
+
+  function effectiveEC(){ return state.logoDataUrl ? 'H' : $('ecLevel').value; }
+
+  function drawModules(ctx, qr, px, fg, bg, quiet){
+    var n = qr.getModuleCount(), total = n + quiet * 2;
+    var s = px / total;
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, px, px);
+    ctx.fillStyle = fg;
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++)
+      if (qr.isDark(r, c)) ctx.fillRect(Math.floor((c + quiet) * s), Math.floor((r + quiet) * s), Math.ceil(s), Math.ceil(s));
+  }
+
+  function svgFromQR(qr, fg, bg, quiet){
+    var n = qr.getModuleCount(), total = n + quiet * 2, unit = 10, W = total * unit, parts = [];
+    parts.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + W + '" width="' + W + '" height="' + W + '">');
+    parts.push('<rect width="' + W + '" height="' + W + '" fill="' + bg + '"/>');
+    var d = '';
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++)
+      if (qr.isDark(r, c)) d += 'M' + ((c + quiet) * unit) + ' ' + ((r + quiet) * unit) + 'h' + unit + 'v' + unit + 'h-' + unit + 'Z';
+    parts.push('<path fill="' + fg + '" d="' + d + '"/>');
+    parts.push('</svg>');
+    return parts.join('');
+  }
+
+  function drawLogoOnCanvas(canvas, done){
+    if (!state.logoImg){ if (done) done(); return; }
+    var ctx = canvas.getContext('2d');
+    var pct = parseInt($('logoSize').value, 10) / 100;
+    var w = canvas.width * pct, h = canvas.height * pct;
+    var x = (canvas.width - w) / 2, y = (canvas.height - h) / 2;
+    var pad = w * 0.12;
+    ctx.fillStyle = $('bgColor').value;
+    var bx = x - pad, by = y - pad, bw = w + pad * 2, bh = h + pad * 2, br = bw * 0.18;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, bw, bh, br); else ctx.rect(bx, by, bw, bh);
+    ctx.fill();
+    ctx.drawImage(state.logoImg, x, y, w, h);
+    if (done) done();
+  }
+
+  function update(){
+    var res = buildPayload();
+    $('charCount').textContent = res.text.length + ' characters';
+    $('payloadPreview').textContent = res.text ? (res.text.length > 60 ? res.text.slice(0, 60) + '…' : res.text) : '';
+    if (res.error){
+      formError.textContent = res.error; formError.classList.remove('hidden');
+      showEmpty(); return;
+    }
+    formError.classList.add('hidden');
+    state.currentText = res.text;
+    var qr;
+    try {
+      qr = qrcode(0, effectiveEC());
+      qr.addData(res.text);
+      qr.make();
+    } catch(e){
+      formError.textContent = 'This content is too long for a QR code — shorten it and try again.';
+      formError.classList.remove('hidden');
+      showEmpty(); return;
+    }
+    state.lastQR = qr;
+    var canvas = $('qrCanvas');
+    var size = 600;
+    canvas.width = size; canvas.height = size;
+    drawModules(canvas.getContext('2d'), qr, size, $('fgColor').value, $('bgColor').value, parseInt($('quietZone').value, 10));
+    drawLogoOnCanvas(canvas);
+    canvas.classList.remove('hidden');
+    $('qrEmpty').classList.add('hidden');
+    $('scanHint').classList.remove('hidden');
+    $('btnPNG').disabled = false; $('btnSVG').disabled = false;
+    $('ecNote').textContent = state.logoDataUrl ? 'Raised to H because a logo is attached.' : 'Auto-raised to H when a logo is added.';
+  }
+
+  function showEmpty(){
+    state.currentText = ''; state.lastQR = null;
+    $('qrCanvas').classList.add('hidden');
+    $('qrEmpty').classList.remove('hidden');
+    $('scanHint').classList.add('hidden');
+    $('btnPNG').disabled = true; $('btnSVG').disabled = true;
+  }
+
+  var timer = null;
+  function scheduleUpdate(){ clearTimeout(timer); timer = setTimeout(update, 220); }
+
+  function downloadURI(uri, name){
+    var a = document.createElement('a');
+    a.href = uri; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  $('btnPNG').addEventListener('click', function(){
+    if (!state.lastQR) return;
+    var size = parseInt($('pngSize').value, 10);
+    var c = document.createElement('canvas'); c.width = size; c.height = size;
+    drawModules(c.getContext('2d'), state.lastQR, size, $('fgColor').value, $('bgColor').value, parseInt($('quietZone').value, 10));
+    drawLogoOnCanvas(c, function(){ downloadURI(c.toDataURL('image/png'), 'scanova-qr-' + size + 'px.png'); });
+  });
+
+  $('btnSVG').addEventListener('click', function(){
+    if (!state.lastQR) return;
+    var svg = svgFromQR(state.lastQR, $('fgColor').value, $('bgColor').value, parseInt($('quietZone').value, 10));
+    var blob = new Blob([svg], {type:'image/svg+xml'});
+    var url = URL.createObjectURL(blob);
+    downloadURI(url, 'scanova-qr.svg');
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  });
+
+  $('logoFile').addEventListener('change', function(e){
+    var f = e.target.files[0]; if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var img = new Image();
+      img.onload = function(){ state.logoImg = img; state.logoDataUrl = reader.result; updateLogoUI(); update(); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(f);
+  });
+  function updateLogoUI(){
+    $('logoClear').classList.toggle('hidden', !state.logoDataUrl);
+    $('logoName').textContent = state.logoDataUrl ? 'logo attached ✓' : '';
+  }
+  $('logoClear').addEventListener('click', function(){
+    state.logoDataUrl = null; state.logoImg = null;
+    $('logoFile').value = ''; updateLogoUI(); update();
+  });
+
+  ['fgColor','bgColor','pngSize','ecLevel','quietZone','logoSize'].forEach(function(id){
+    $(id).addEventListener('input', function(){
+      if (id === 'fgColor') $('fgHex').textContent = $('fgColor').value.toUpperCase();
+      if (id === 'bgColor') $('bgHex').textContent = $('bgColor').value.toUpperCase();
+      if (id === 'quietZone') $('qzVal').textContent = $('quietZone').value;
+      if (id === 'logoSize') $('logoSizeVal').textContent = $('logoSize').value + '%';
+      if (state.currentText) update();
+    });
+    $(id).addEventListener('change', function(){ if (state.currentText) update(); });
+  });
+
+  // Batch mode
+  $('btnBatch').addEventListener('click', function(){
+    var lines = parseBatchList($('batchInput').value);
+    var grid = $('batchGrid'); grid.innerHTML = '';
+    if (!lines.length){
+      $('batchEmpty').textContent = 'Paste at least one line above to generate batch QRs.';
+      $('batchEmpty').classList.remove('hidden'); return;
+    }
+    lines = lines.slice(0, 50);
+    $('batchEmpty').classList.add('hidden');
+    lines.forEach(function(line, i){
+      var cell = document.createElement('div');
+      cell.className = 'qr-cell bg-white rounded-2xl border border-violet-100 p-3 flex flex-col items-center shadow-sm';
+      var c = document.createElement('canvas'); c.width = 200; c.height = 200; c.className = 'w-full aspect-square rounded-xl';
+      try {
+        var qr = qrcode(0, 'M'); qr.addData(line); qr.make();
+        drawModules(c.getContext('2d'), qr, 200, '#1e1b4b', '#ffffff', 2);
+        var label = document.createElement('p');
+        label.className = 'mt-2 text-[11px] font-bold text-slate-500 truncate w-full text-center';
+        label.textContent = (i + 1) + '. ' + (line.length > 26 ? line.slice(0, 26) + '…' : line);
+        label.title = line;
+        var row = document.createElement('div');
+        row.className = 'mt-1 flex gap-2';
+        var bPng = document.createElement('button');
+        bPng.className = 'text-[11px] font-extrabold text-violet-600 hover:text-violet-800';
+        bPng.textContent = 'PNG ↓';
+        bPng.addEventListener('click', function(){ downloadURI(c.toDataURL('image/png'), 'scanova-batch-' + (i + 1) + '.png'); });
+        var bSvg = document.createElement('button');
+        bSvg.className = 'text-[11px] font-extrabold text-rose-500 hover:text-rose-700';
+        bSvg.textContent = 'SVG ↓';
+        bSvg.addEventListener('click', function(){
+          var svg = svgFromQR(qr, '#1e1b4b', '#ffffff', 2);
+          var url = URL.createObjectURL(new Blob([svg], {type:'image/svg+xml'}));
+          downloadURI(url, 'scanova-batch-' + (i + 1) + '.svg');
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+        });
+        row.appendChild(bPng); row.appendChild(bSvg);
+        cell.appendChild(c); cell.appendChild(label); cell.appendChild(row);
+      } catch(e){
+        cell.innerHTML = '<p class="text-[11px] font-bold text-rose-500 text-center py-6">Too long —<br>skipped</p>';
+      }
+      grid.appendChild(cell);
+    });
+    if (lines.length === 50) $('batchEmpty').textContent = 'Showing first 50 of your list.';
+  });
+
+  renderPills();
+  renderForm();
+})();
+</script>
+</body>
+</html>
